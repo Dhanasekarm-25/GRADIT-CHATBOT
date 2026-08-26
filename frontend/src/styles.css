@@ -1,0 +1,59 @@
+/* ==========================================================================
+   GLOBAL STYLES & CLEAN WHITE & BEIGE ERP THEME
+   Palette: White (#FFFFFF), Warm Beige (#FBF9F5, #F4EFE6), Slate (#1E293B)
+   Role & Semantic: Blue (#1D4ED8), Green (#15803D), Red (#B91C1C), Mustard (#B45309)
+   ========================================================================== */
+
+:root {
+  --bg-page: #fbf9f5;
+  --bg-card: #ffffff;
+  --bg-subtle: #f4efe6;
+  --bg-sidebar: #f7f4ed;
+
+  --border-light: #e5dfd5;
+  --border-medium: #d6cdbe;
+
+  --text-dark: #1e293b;
+  --text-body: #334155;
+  --text-muted: #64748b;
+
+  --color-blue: #1d4ed8;
+  --color-blue-bg: #eff6ff;
+  --color-blue-border: #bfdbfe;
+
+  --color-green: #15803d;
+  --color-green-bg: #f0fdf4;
+  --color-green-border: #bbf7d0;
+
+  --color-mustard: #b45309;
+  --color-mustard-bg: #fffbeb;
+  --color-mustard-border: #fde68a;
+
+  --color-red: #b91c1c;
+  --color-red-bg: #fef2f2;
+  --color-red-border: #fecaca;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Outfit', var(--font-sans);
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-body);
+  line-height: 1.5;
+  height: 100vh;
+  overflow: hidden;
+}

@@ -1,0 +1,38 @@
+{
+  "name": "frontend-ng",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "dev": "ng serve --port 3000 --host 0.0.0.0",
+    "start": "ng serve --port 3000 --host 0.0.0.0",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "packageManager": "npm@10.9.8",
+  "dependencies": {
+    "@angular/common": "^22.1.0",
+    "@angular/compiler": "^22.1.0",
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0",
+    "@angular/platform-browser": "^22.1.0",
+    "@angular/router": "^22.1.0",
+    "docx": "^9.7.1",
+    "dompurify": "^3.4.14",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "marked": "^18.0.11",
+    "rxjs": "^7.8.1",
+    "tslib": "^2.3.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.1.4",
+    "@angular/cli": "^22.1.4",
+    "@angular/compiler-cli": "^22.1.0",
+    "@types/dompurify": "^3.0.5",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.2"
+  }
+}

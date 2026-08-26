@@ -1,0 +1,592 @@
+<div class="app-layout">
+  <!-- ========================================================================
+       SIDEBAR
+       ======================================================================== -->
+  <aside class="sidebar">
+    <!-- Header -->
+    <div class="sidebar-header">
+      <div class="brand-logo">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">GRADIT <span class="brand-accent">AI</span></h1>
+          <p class="brand-subtitle">University ERP Intelligence</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Identity Selector (Clean Role Options ONLY - No student names) -->
+    <div class="section-block">
+      <div class="section-label">
+        <span>Active Identity & Portal</span>
+        <span class="badge-role" [ngClass]="activeUser.role">{{ activeUser.role | uppercase }}</span>
+      </div>
+
+      <div class="user-select-card">
+        <div class="user-select-header">
+          <span class="user-avatar">{{ activeUser.avatar }}</span>
+          <div class="user-meta">
+            <span class="user-name">{{ activeUser.name }}</span>
+            <span class="user-id-dept">{{ activeUser.department }}</span>
+          </div>
+        </div>
+
+        <select class="custom-select" [value]="selectedRoleId" (change)="onRoleSelectChange($event)">
+          <optgroup label="🛡️ University Administrators">
+            <option value="ADM_SUPER">🛡️ Super Administrator (All Access)</option>
+            <option value="ADM_EXAM">📋 Examination Cell Controller</option>
+            <option value="ADM_FINANCE">💳 Finance & Accounts Officer</option>
+          </optgroup>
+
+          <optgroup label="👨‍🏫 Faculty & Class Teachers">
+            <option value="201">👩‍🏫 Prof. Anita Sharma — Class Teacher (MCA A)</option>
+            <option value="202">👨‍🏫 Prof. Kumar S — Class Teacher (MCA B)</option>
+            <option value="203">👩‍🏫 Prof. Priya R — Class Teacher (MCA Gen AI A)</option>
+            <option value="205">👩‍🏫 Prof. Meena V — Class Teacher (MCA Gen AI B)</option>
+          </optgroup>
+
+          <optgroup label="🎓 Student Portal">
+            <option value="1">🎓 Student Self-Service Portal</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Verified Access Badges -->
+      <div class="permissions-list">
+        <span class="permission-pill active"><span class="dot"></span> 200 Students Connected</span>
+        <span class="permission-pill active"><span class="dot"></span> Groq Fast Reasoning</span>
+      </div>
+    </div>
+
+    <!-- Class Section Scope Selector -->
+    <div class="section-block">
+      <div class="section-label">
+        <span>Section Focus Filter</span>
+        <span class="badge-due paid">{{ activeClassScope === 'all' ? 'All Classes' : activeClassScope }}</span>
+      </div>
+      <select class="custom-select" [(ngModel)]="activeClassScope" (ngModelChange)="onClassScopeChange($event)">
+        <option value="all">🌐 All 4 Sections (200 Students)</option>
+        <option value="MCA A">📂 MCA A (IDs 1–50 • Prof. Anita Sharma)</option>
+        <option value="MCA B">📂 MCA B (IDs 51–100 • Prof. Kumar S)</option>
+        <option value="MCA Gen AI A">📂 MCA Gen AI A (IDs 101–150 • Prof. Priya R)</option>
+        <option value="MCA Gen AI B">📂 MCA Gen AI B (IDs 151–200 • Prof. Meena V)</option>
+      </select>
+    </div>
+
+    <!-- Faculty & Section Directory Quick Lookup -->
+    <div class="section-block">
+      <div class="section-label">
+        <span>Faculty & Class Teachers</span>
+        <span class="status-indicator live">5 Professors</span>
+      </div>
+      <div class="faculty-quick-list">
+        <div class="faculty-mini-item" (click)="sendMessage('Who is the class teacher of MCA A and what subjects are taught?')">
+          <span class="fac-avatar">👩‍🏫</span>
+          <div class="fac-info">
+            <strong>Prof. Anita Sharma</strong>
+            <span>Class Teacher: MCA A • Comp Applications</span>
+          </div>
+        </div>
+        <div class="faculty-mini-item" (click)="sendMessage('Who is the class teacher of MCA B and what subjects are taught?')">
+          <span class="fac-avatar">👨‍🏫</span>
+          <div class="fac-info">
+            <strong>Prof. Kumar S</strong>
+            <span>Class Teacher: MCA B • Comp Applications</span>
+          </div>
+        </div>
+        <div class="faculty-mini-item" (click)="sendMessage('Who is the class teacher of MCA Gen AI A?')">
+          <span class="fac-avatar">👩‍🏫</span>
+          <div class="fac-info">
+            <strong>Prof. Priya R</strong>
+            <span>Class Teacher: MCA Gen AI A • Artificial Intelligence</span>
+          </div>
+        </div>
+        <div class="faculty-mini-item" (click)="sendMessage('Who is the class teacher of MCA Gen AI B?')">
+          <span class="fac-avatar">👩‍🏫</span>
+          <div class="fac-info">
+            <strong>Prof. Meena V</strong>
+            <span>Class Teacher: MCA Gen AI B • Artificial Intelligence</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <div class="connection-status-card">
+        <div class="status-header">
+          <div class="status-pill" [ngClass]="backendOnline ? 'online' : 'offline'">
+            <span class="ping-dot"></span>
+            <span>{{ backendOnline ? 'System Online (200 Students)' : 'Backend Offline' }}</span>
+          </div>
+          <button class="icon-button" (click)="openSettings()" title="Settings">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========================================================================
+       MAIN CHAT CONTAINER
+       ======================================================================== -->
+  <main class="chat-container">
+    <!-- Clean Top Navigation Bar -->
+    <header class="chat-header">
+      <div class="header-left">
+        <div class="active-chat-info">
+          <div class="ai-avatar-badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5 8 12 8 12s8-7 8-12a8 8 0 0 0-8-8z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          </div>
+          <div>
+            <h2 class="chat-title">
+              {{ activeUser.name }}
+            </h2>
+            <p class="chat-subtitle">
+              {{ activeUser.department }} • 200 Students Connected across 4 Sections
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header Actions: Admin Directory, 3-Format Export Menu, Clear Chat -->
+      <div class="header-actions">
+        <!-- Master Directory Button -->
+        <button class="btn-action-accent" (click)="openAdminPortal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Admin Directory (200)</span>
+        </button>
+
+        <!-- 3-Format Download / Export Menu -->
+        <div class="export-dropdown-wrapper">
+          <button class="btn-action-ghost" (click)="toggleExportMenu()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <!-- Dropdown Options -->
+          <div class="export-menu-card" *ngIf="isExportMenuOpen">
+            <div class="export-menu-section">
+              <span class="export-menu-heading">👤 Current Student Dossier</span>
+              <div class="export-buttons-row">
+                <button class="btn-export-badge pdf" (click)="exportCurrentStudent('pdf')">.PDF</button>
+                <button class="btn-export-badge xlsx" (click)="exportCurrentStudent('xlsx')">.XLSX</button>
+                <button class="btn-export-badge docx" (click)="exportCurrentStudent('docx')">.DOCX</button>
+              </div>
+            </div>
+
+            <div class="export-menu-section">
+              <span class="export-menu-heading">💬 Conversation Transcript</span>
+              <div class="export-buttons-row">
+                <button class="btn-export-badge pdf" (click)="exportConversation('pdf')">.PDF</button>
+                <button class="btn-export-badge xlsx" (click)="exportConversation('xlsx')">.XLSX</button>
+                <button class="btn-export-badge docx" (click)="exportConversation('docx')">.DOCX</button>
+              </div>
+            </div>
+
+            <div class="export-menu-section">
+              <span class="export-menu-heading">📊 Queried Students in Session</span>
+              <div class="export-buttons-row">
+                <button class="btn-export-badge pdf" (click)="exportDirectory('pdf', 'queried')">.PDF</button>
+                <button class="btn-export-badge xlsx" (click)="exportDirectory('xlsx', 'queried')">.XLSX</button>
+                <button class="btn-export-badge docx" (click)="exportDirectory('docx', 'queried')">.DOCX</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-action-ghost" (click)="clearChat()" title="Clear Chat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Clear</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Messages Container -->
+    <div class="chat-messages" #chatScrollContainer>
+      <!-- Hero Card when empty -->
+      <div class="welcome-card" *ngIf="messages.length === 0">
+        <div class="welcome-icon">🎓</div>
+        <h3>GRADIT AI ERP Assistant</h3>
+        <p>
+          Search any student by <strong>Name</strong> (e.g. <em>Chandru</em>, <em>Arjun</em>, <em>Aadhya</em>), 
+          <strong>Student ID</strong>, or <strong>Email</strong> across all 4 sections.
+        </p>
+
+        <!-- Sample Questions -->
+        <div class="prompt-chips-row">
+          <button class="prompt-pill" (click)="sendMessage('give me the chandru details')">
+            👥 "give me the chandru details"
+          </button>
+          <button class="prompt-pill" (click)="sendMessage('give arjun details')">
+            🔍 "give arjun details"
+          </button>
+          <button class="prompt-pill" (click)="sendMessage('show marks and fees for student 160')">
+            📊 "Marks & Fees for Student #160"
+          </button>
+          <button class="prompt-pill" (click)="sendMessage('Who is the class teacher of MCA Gen AI A?')">
+            👩‍🏫 "Class Teacher of MCA Gen AI A"
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Stream -->
+      <div *ngFor="let msg of messages" class="message-row" [ngClass]="msg.role === 'user' ? 'user-row' : 'assistant-row'">
+        <div class="msg-avatar">
+          {{ msg.role === 'user' ? activeUser.avatar : '🤖' }}
+        </div>
+        <div class="msg-content-wrapper">
+          <div class="msg-sender-meta">
+            <span>{{ msg.senderName }}</span> • <span>{{ msg.time }}</span>
+          </div>
+
+          <div class="msg-bubble">
+            <!-- Sanitized Clean Markdown Content -->
+            <div [innerHTML]="renderMarkdown(msg.content)"></div>
+
+            <!-- Download Button directly on Student Result -->
+            <div class="bubble-student-actions" *ngIf="msg.studentContext">
+              <span class="action-label">Export this Student Record:</span>
+              <div class="download-chips">
+                <button class="chip-download pdf" (click)="exportCurrentStudent('pdf', msg.studentContext)">📄 .PDF</button>
+                <button class="chip-download xlsx" (click)="exportCurrentStudent('xlsx', msg.studentContext)">📊 .XLSX</button>
+                <button class="chip-download docx" (click)="exportCurrentStudent('docx', msg.studentContext)">📝 .DOCX</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Floating Candidate Chooser Box if Active -->
+      <div class="disambiguation-box" *ngIf="disambiguationCandidates.length > 0">
+        <div class="disambiguation-header">
+          <span class="badge-disambig">SELECT STUDENT</span>
+          <strong>Multiple students match your query. Click any student to view full profile & download:</strong>
+        </div>
+        <div class="candidates-grid">
+          <div *ngFor="let c of disambiguationCandidates" class="candidate-card">
+            <div class="candidate-top">
+              <strong>#{{ c.student_id }} {{ c.full_name }}</strong>
+              <span class="badge-class">{{ c.class_name }}</span>
+            </div>
+            <div class="candidate-sub">
+              <code>{{ c.register_number }}</code> • <span>{{ c.email }}</span>
+            </div>
+            <div class="candidate-actions-row">
+              <button class="btn-cand-action view" (click)="viewCandidateDossier(c)">
+                📄 View Dossier & Marks
+              </button>
+              <button class="btn-cand-action chat" (click)="selectCandidateAndChat(c)">
+                💬 Ask AI Details
+              </button>
+              <div class="cand-download-chips">
+                <button class="chip-download pdf" (click)="exportCandidateDirect('pdf', c)">📄 .PDF</button>
+                <button class="chip-download xlsx" (click)="exportCandidateDirect('xlsx', c)">📊 .XLSX</button>
+                <button class="chip-download docx" (click)="exportCandidateDirect('docx', c)">📝 .DOCX</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing Indicator -->
+    <div class="typing-indicator-container" *ngIf="isSending">
+      <div class="typing-bubble">
+        <span class="typing-avatar">🤖</span>
+        <div class="dots-wrapper">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+        <span class="typing-text">AI is querying PostgreSQL records...</span>
+      </div>
+    </div>
+
+    <!-- Input Composer -->
+    <div class="chat-input-wrapper">
+      <form class="chat-form" (submit)="sendMessage()">
+        <div class="input-container">
+          <textarea
+            #messageTextarea
+            [(ngModel)]="currentInput"
+            name="messageInput"
+            placeholder="Search by Name (e.g. 'Chandru', 'Arjun'), Student ID (e.g. '160'), Email, or Faculty..."
+            rows="1"
+            (keydown.enter)="$event.preventDefault(); sendMessage()"
+            required
+          ></textarea>
+          <button type="submit" class="btn-send" [disabled]="!currentInput.trim() || isSending">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </form>
+      <div class="input-disclaimer">
+        🔒 University ERP Database • Enforced by Role-Based Access Control
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ==========================================================================
+     ADMIN PORTAL DIRECTORY MODAL WITH ALL 4 SECTIONS, PAGINATION & EXPORTS
+     ========================================================================== -->
+<div class="modal-backdrop" *ngIf="isAdminPortalOpen">
+  <div class="modal-card wide-modal">
+    <div class="modal-header">
+      <div class="admin-portal-title">
+        <span class="portal-badge">ADMIN PORTAL</span>
+        <h3>Master Student Directory (All 200 Students)</h3>
+      </div>
+      <button class="modal-close-btn" (click)="closeAdminPortal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Search Bar & Class Filter Tabs -->
+      <div class="admin-controls-bar">
+        <div class="search-box">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            [(ngModel)]="adminSearchQuery"
+            (input)="onAdminSearchChange()"
+            placeholder="Search by Name (e.g. Chandru), Student ID (e.g. 160), or Email..."
+          />
+        </div>
+
+        <div class="filter-pills">
+          <button class="filter-pill" [class.active]="adminActiveFilter === 'all'" (click)="setAdminFilter('all')">
+            All (200)
+          </button>
+          <button class="filter-pill" [class.active]="adminActiveFilter === 'MCA A'" (click)="setAdminFilter('MCA A')">
+            MCA A (50)
+          </button>
+          <button class="filter-pill" [class.active]="adminActiveFilter === 'MCA B'" (click)="setAdminFilter('MCA B')">
+            MCA B (50)
+          </button>
+          <button class="filter-pill" [class.active]="adminActiveFilter === 'MCA Gen AI A'" (click)="setAdminFilter('MCA Gen AI A')">
+            MCA Gen AI A (50)
+          </button>
+          <button class="filter-pill" [class.active]="adminActiveFilter === 'MCA Gen AI B'" (click)="setAdminFilter('MCA Gen AI B')">
+            MCA Gen AI B (50)
+          </button>
+        </div>
+      </div>
+
+      <!-- Students Table -->
+      <div class="admin-table-container">
+        <table class="admin-data-table">
+          <thead>
+            <tr>
+              <th style="width: 55px;">ID</th>
+              <th>Student & Email</th>
+              <th>Register No</th>
+              <th>Class</th>
+              <th>Gender</th>
+              <th>IA 1 Score</th>
+              <th>Attendance</th>
+              <th>Fee Status</th>
+              <th style="text-align: center; width: 170px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="getPaginatedStudents().length === 0">
+              <td colspan="9" style="text-align: center; padding: 25px; color: var(--text-muted);">
+                No students found matching "{{ adminSearchQuery }}" in section "{{ adminActiveFilter }}".
+              </td>
+            </tr>
+            <tr *ngFor="let s of getPaginatedStudents()">
+              <td><strong>#{{ s.student_id }}</strong></td>
+              <td>
+                <strong>{{ s.full_name }}</strong>
+                <span class="student-email-sub">{{ s.email || 'student' + s.student_id + '@collegeerp.com' }}</span>
+              </td>
+              <td><code>{{ s.register_number }}</code></td>
+              <td><span style="color: var(--color-blue); font-weight: 600;">{{ s.class_name }}</span></td>
+              <td>{{ s.gender === 'FEMALE' ? '👩 Female' : '👨 Male' }}</td>
+              <td><span style="font-weight: 700;">{{ s.marks_obtained }} ({{ s.grade }})</span></td>
+              <td><span style="color: var(--color-green); font-weight: 600;">{{ s.attendance_pct || 100 }}%</span></td>
+              <td>
+                <span class="badge-due" [ngClass]="s.fee_status === 'PAID' ? 'paid' : 'partial'">
+                  {{ s.fee_status || 'PAID' }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons-cell">
+                  <button class="btn-action-chat" (click)="chatAboutStudent(s)" title="Ask AI about student">
+                    💬 Chat
+                  </button>
+                  <button class="btn-action-view" (click)="viewStudentModal(s)" title="View & Download dossier">
+                    📄 Dossier
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Bar -->
+      <div class="pagination-bar">
+        <div class="pagination-info">
+          Showing {{ filteredAdminStudents.length === 0 ? 0 : (adminCurrentPage - 1) * adminRowsPerPage + 1 }}–{{
+            getAdminTotalPages() === adminCurrentPage ? filteredAdminStudents.length : adminCurrentPage * adminRowsPerPage
+          }} of {{ filteredAdminStudents.length }} students
+        </div>
+
+        <div class="pagination-controls">
+          <button class="page-btn" [disabled]="adminCurrentPage === 1" (click)="goToAdminPage(1)">« First</button>
+          <button class="page-btn" [disabled]="adminCurrentPage === 1" (click)="goToAdminPage(adminCurrentPage - 1)">‹ Prev</button>
+          <span class="page-current">Page {{ adminCurrentPage }} of {{ getAdminTotalPages() }}</span>
+          <button class="page-btn" [disabled]="adminCurrentPage === getAdminTotalPages()" (click)="goToAdminPage(adminCurrentPage + 1)">Next ›</button>
+          <button class="page-btn" [disabled]="adminCurrentPage === getAdminTotalPages()" (click)="goToAdminPage(getAdminTotalPages())">Last »</button>
+        </div>
+
+        <div class="pagination-rows-select">
+          <span>Rows:</span>
+          <select class="limit-select" (change)="onAdminRowsPerPageChange($event)">
+            <option value="10">10</option>
+            <option value="15" selected>15</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="200">All (200)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer with Directory Export -->
+    <div class="modal-footer space-between">
+      <div class="export-directory-group">
+        <span>Download Filtered Directory ({{ filteredAdminStudents.length }} Records):</span>
+        <button class="chip-download pdf" (click)="exportDirectory('pdf')">📄 .PDF</button>
+        <button class="chip-download xlsx" (click)="exportDirectory('xlsx')">📊 .XLSX</button>
+        <button class="chip-download docx" (click)="exportDirectory('docx')">📝 .DOCX</button>
+      </div>
+      <button class="btn-secondary" (click)="closeAdminPortal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     STUDENT DOSSIER MODAL WITH DIRECT DOWNLOAD
+     ========================================================================== -->
+<div class="modal-backdrop" *ngIf="isStudentDetailModalOpen && selectedStudentForModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>Student Academic Dossier</h3>
+      <button class="modal-close-btn" (click)="closeStudentModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="student-dossier-card">
+        <div class="dossier-header">
+          <div class="dossier-avatar">🎓</div>
+          <div>
+            <h4>{{ selectedStudentForModal.full_name }}</h4>
+            <p>{{ selectedStudentForModal.register_number }} • {{ selectedStudentForModal.class_name }}</p>
+            <p style="font-size: 0.76rem; color: var(--text-muted);">{{ selectedStudentForModal.email }}</p>
+          </div>
+        </div>
+
+        <table class="dossier-table">
+          <tr>
+            <td><strong>Student ID:</strong></td>
+            <td>#{{ selectedStudentForModal.student_id }}</td>
+          </tr>
+          <tr>
+            <td><strong>IA 1 Score:</strong></td>
+            <td><strong style="color: var(--color-blue)">{{ selectedStudentForModal.marks_obtained }} / 100 (Grade {{ selectedStudentForModal.grade }})</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Attendance:</strong></td>
+            <td><strong style="color: var(--color-green)">{{ selectedStudentForModal.attendance_pct || 100 }}% (Eligible)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Tuition Fee:</strong></td>
+            <td>Rs. {{ selectedStudentForModal.fee_amount }}</td>
+          </tr>
+          <tr>
+            <td><strong>Fee Status:</strong></td>
+            <td><span class="badge-due" [ngClass]="selectedStudentForModal.fee_status === 'PAID' ? 'paid' : 'partial'">{{ selectedStudentForModal.fee_status }}</span></td>
+          </tr>
+          <tr>
+            <td><strong>Balance Due:</strong></td>
+            <td>Rs. {{ selectedStudentForModal.balance_due }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Download Formats for this Student -->
+      <div class="dossier-download-bar">
+        <span>Download Official Report:</span>
+        <div class="download-chips">
+          <button class="chip-download pdf" (click)="exportCurrentStudent('pdf', selectedStudentForModal)">📄 .PDF</button>
+          <button class="chip-download xlsx" (click)="exportCurrentStudent('xlsx', selectedStudentForModal)">📊 .XLSX</button>
+          <button class="chip-download docx" (click)="exportCurrentStudent('docx', selectedStudentForModal)">📝 .DOCX</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeStudentModal()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     SERVER SETTINGS MODAL
+     ========================================================================== -->
+<div class="modal-backdrop" *ngIf="isSettingsOpen">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>⚙️ Server Configuration</h3>
+      <button class="modal-close-btn" (click)="closeSettings()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <label class="form-label">Backend API URL</label>
+      <input type="text" class="form-input" [(ngModel)]="backendUrl" />
+      <p class="form-hint">Points to Express backend running on Laptop 2 (Port 5000).</p>
+
+      <div class="modal-health-box">
+        <h4>Database & Server Telemetry</h4>
+        <p>● Backend Status: <strong [style.color]="backendOnline ? 'var(--color-green)' : 'var(--color-red)'">{{ backendOnline ? 'ONLINE' : 'OFFLINE' }}</strong></p>
+        <p>● Total Active Students: <strong>{{ totalStudentsCount }} Records</strong></p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="checkHealth()">Test Connection</button>
+      <button class="btn-primary" (click)="saveSettings()">Save & Apply</button>
+    </div>
+  </div>
+</div>
